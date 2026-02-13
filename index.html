@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine Game ❤️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Comic+Neue:wght@700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', 'Comic Neue', cursive;
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFC0CB 50%, #FFB6C1 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            overflow-y: auto;
+        }
+
+        /* Pantalla de Inicio */
+        .start-screen {
+            text-align: center;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .title {
+            font-size: clamp(60px, 15vw, 150px);
+            font-weight: 700;
+            color: #FF1744;
+            text-shadow: 5px 5px 0px #FFC0CB, 8px 8px 0px #FF69B4;
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            animation: bounce 2s infinite;
+            font-family: 'Comic Neue', cursive;
+        }
+
+        .subtitle {
+            font-size: clamp(24px, 4vw, 36px);
+            color: #D81B60;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .subtitle-heart {
+            font-size: clamp(30px, 5vw, 50px);
+            display: inline-block;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, #FF1744 0%, #D81B60 100%);
+            color: white;
+            border: 5px solid #8B0000;
+            border-radius: 50px;
+            padding: 25px 60px;
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(255, 23, 68, 0.5);
+            transition: all 0.3s ease;
+            font-family: 'Fredoka', cursive;
+        }
+
+        .start-button:hover {
+            transform: scale(1.1) rotate(-2deg);
+            box-shadow: 0 15px 40px rgba(255, 23, 68, 0.7);
+        }
+
+        .start-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Pantalla de Juego */
+        .game-screen {
+            display: none;
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .level-badge {
+            background: #FF1744;
+            color: white;
+            padding: 12px 35px;
+            border-radius: 30px;
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 30px;
+            border: 4px solid #8B0000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .question-box {
+            background: white;
+            border: 6px solid #FF69B4;
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .question-box {
+                padding: 25px 20px;
+                margin-bottom: 20px;
+            }
+            
+            .option-button {
+                padding: 20px 20px;
+                font-size: clamp(16px, 4vw, 22px);
+            }
+            
+            .final-message {
+                padding: 30px 25px;
+            }
+        }
+
+        .question-text {
+            font-size: clamp(22px, 3.5vw, 32px);
+            color: #333;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .option-button {
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFC0CB 100%);
+            border: 5px solid #FF69B4;
+            border-radius: 25px;
+            padding: 25px 30px;
+            font-size: clamp(18px, 3vw, 26px);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #D81B60;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Fredoka', cursive;
+        }
+
+        .option-button:hover {
+            transform: translateX(10px) scale(1.02);
+            border-color: #FF1744;
+            box-shadow: 0 8px 25px rgba(255, 23, 68, 0.4);
+        }
+
+        .option-button:active {
+            transform: scale(0.98);
+        }
+
+        .option-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transition: left 0.5s;
+        }
+
+        .option-button:hover::before {
+            left: 100%;
+        }
+
+        /* Pantalla de Feedback */
+        .feedback-screen {
+            display: none;
+            text-align: center;
+            animation: zoomIn 0.5s ease-out;
+        }
+
+        .feedback-message {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            color: #FF1744;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: white;
+            border-radius: 30px;
+            border: 6px solid #FF69B4;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            line-height: 1.4;
+        }
+
+        .feedback-message.correct {
+            color: #FF1744;
+            border-color: #FF69B4;
+        }
+
+        .feedback-message.incorrect {
+            color: #D81B60;
+            border-color: #FF1744;
+        }
+
+        /* Pantalla Final */
+        .final-screen {
+            display: none;
+            text-align: center;
+            max-width: 1000px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .final-title {
+            font-size: clamp(40px, 8vw, 80px);
+            font-weight: 700;
+            color: #FF1744;
+            text-shadow: 4px 4px 0px #FFC0CB;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        .final-message {
+            background: white;
+            border: 6px solid #FF69B4;
+            border-radius: 30px;
+            padding: 50px;
+            font-size: clamp(18px, 3vw, 28px);
+            color: #333;
+            line-height: 1.8;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            font-weight: 600;
+        }
+
+        .final-message strong {
+            color: #FF1744;
+            font-size: clamp(22px, 4vw, 36px);
+            display: block;
+            margin: 20px 0;
+        }
+
+        /* Sistema de Partículas */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+        }
+
+        /* Decoración de fondo */
+        .heart-bg {
+            position: fixed;
+            font-size: 50px;
+            opacity: 0.1;
+            z-index: 0;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Decoración de fondo -->
+    <div class="heart-bg" style="top: 10%; left: 10%;">❤️</div>
+    <div class="heart-bg" style="top: 20%; right: 15%; animation-delay: 0.5s;">💕</div>
+    <div class="heart-bg" style="bottom: 15%; left: 20%; animation-delay: 1s;">💖</div>
+    <div class="heart-bg" style="bottom: 25%; right: 10%; animation-delay: 1.5s;">💗</div>
+    <div class="heart-bg" style="top: 50%; left: 5%; animation-delay: 2s;">❤️</div>
+    <div class="heart-bg" style="top: 60%; right: 5%; animation-delay: 2.5s;">💕</div>
+
+    <!-- Música de fondo -->
+    <audio id="backgroundMusic" loop>
+        <source src="la-mujer-perfecta.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="container">
+        <!-- Pantalla de Inicio -->
+        <div class="start-screen" id="startScreen">
+            <h1 class="title">Valentine<br>Game</h1>
+            <p class="subtitle">Hecho solo para ti <span class="subtitle-heart">❤️</span></p>
+            <button class="start-button" onclick="startGame()">Iniciar</button>
+        </div>
+
+        <!-- Pantalla de Juego -->
+        <div class="game-screen" id="gameScreen">
+            <div class="level-badge" id="levelBadge">Nivel 1</div>
+            <div class="question-box">
+                <p class="question-text" id="questionText"></p>
+            </div>
+            <div class="options" id="optionsContainer"></div>
+        </div>
+
+        <!-- Pantalla de Feedback -->
+        <div class="feedback-screen" id="feedbackScreen">
+            <div class="feedback-message" id="feedbackMessage"></div>
+        </div>
+
+        <!-- Pantalla Final -->
+        <div class="final-screen" id="finalScreen">
+            <h1 class="final-title">¡SENTENCIA FIRME Y EJECUTORIADA! ⚖️❤️</h1>
+            <div class="final-message">
+                <strong>Veredicto Dictado:</strong>
+                Se declara que no existe mujer más amada que tú en toda la jurisdicción. 
+                <br><br>
+                Prepárate para la ejecución de la sentencia... que incluye una vida entera de felicidad a mi lado. 
+                <br><br>
+                <strong>¡Te amo, mi abogada favorita!</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const levels = [
+            {
+                level: 1,
+                title: "El Escrito de Inicio (La Mudanza Mental)",
+                question: "Se me acusa de \"Tentativa\" para vivir contigo, compartir casa, robarte todos los fines de semana y obligarte a escuchar mis canciones raras. ¿Cómo me declaro?",
+                options: [
+                    { text: "A) Inocente, solo quería ver si tus bocinas funcionaban.", correct: false, feedback: "❌ ¡Objeción! Sabes que mis canciones raras suenan mejor cuando las cantamos juntos. ¡Inténtalo de nuevo!" },
+                    { text: "B) Pido libertad bajo fianza para seguir viviendo solo.", correct: false, feedback: "❌ ¿Libertad? Si ya eres mi prisionera favorita. No hay fianza que valga, ¡elige la convivencia!" },
+                    { text: "C) ¡Culpable! Y exijo que la sentencia sea compartir el mismo techo por siempre.", correct: true, feedback: "💕 ¡Confesión admitida! El tribunal dicta que mis canciones raras ahora serán nuestro soundtrack oficial." }
+                ]
+            },
+            {
+                level: 2,
+                title: "Desahogo de Pruebas (La Invasión de Espacio)",
+                question: "Se te acusa de \"Copropiedad afectiva\": nos vemos 24/7, ya decoramos nuestras repisas y llenaste mi galería de fotos juntos. ¿Cuál es tu defensa?",
+                options: [
+                    { text: "A) Es un derecho de posesión definitivo: ya somos uno solo en este nuevo hogar y ya se hizo el pacto de amor.", correct: true, feedback: "💕 ¡Prueba plena! No hay marcha atrás: eres mía y yo soy tuyo, aquí no entra nadie más, mi cielito." },
+                    { text: "B) ¡Objeción! Tú me pusiste toloache en la comida y por eso no me puedo ir de tu lado.", correct: false, feedback: "❌ ¡Improcedente! No fue el toloache, fue mi encanto legal lo que te tiene bajo mi jurisdicción. ¡Prueba otra vez!" },
+                    { text: "C) Exijo un peritaje de brujería, tú me hiciste un amarre desde que éramos pequeños.", correct: false, feedback: "❌ ¡Diligencia rechazada! Si hubo amarre, fue de almas, y ese contrato es de por vida. ¡No niegues la evidencia!" }
+                ]
+            },
+            {
+                level: 3,
+                title: "El Peritaje de Pasión (La Diligencia)",
+                question: "El tribunal solicita un \"Reconocimiento Judicial\" de tus labios para determinar el grado de adicción que me provocan. ¿Cuándo iniciamos la diligencia?",
+                options: [
+                    { text: "A) Lo dejamos para la próxima audiencia el año que viene.", correct: false, feedback: "❌ El tribunal no acepta retardos procesales cuando hay tantas ganas de por medio. ¡Atrévete!" },
+                    { text: "B) Solicito una prórroga para ver si me convencen tus besos.", correct: false, feedback: "❌ ¿Prórroga? Si ya sabes que mis besos son prueba irrefutable. ¡Dale a la correcta!" },
+                    { text: "C) Iniciamos ahora mismo con un peritaje intensivo, bajo las sábanas y sin testigos.", correct: true, feedback: "💕 ¡Diligencia autorizada! El tribunal ordena que el peritaje sea exhaustivo y dure toda la noche." }
+                ]
+            },
+            {
+                level: 4,
+                title: "El Proyecto de Sentencia (Vida Juntos)",
+                question: "Se nos acusa de \"Asociación Delictuosa\" para construir un futuro juntos, compartir gastos, sueños y una misma cama. ¿Aceptas los términos del contrato?",
+                options: [
+                    { text: "A) Prefiero un contrato de arrendamiento temporal, sin compromiso.", correct: false, feedback: "❌ Uy, qué fría... ¡Ni que fuera un Airbnb! Aquí buscamos propiedad definitiva." },
+                    { text: "B) Acepto el trato: un proyecto común donde tú y yo seamos el único veredicto.", correct: true, feedback: "💕 ¡Contrato firmado! El proyecto de vida juntos ha sido elevado a escritura pública. ¡Te amo!" },
+                    { text: "C) Solo si la cláusula incluye que tú siempre lavas los platos.", correct: false, feedback: "❌ Esa cláusula es leonina y abusiva, licenciada. Vamos a negociar algo más romántico." }
+                ]
+            },
+            {
+                level: 5,
+                title: "El Veredicto Final e Inapelable",
+                question: "El juicio ha llegado a su fin. Solo queda dictar la sentencia definitiva: ¿Aceptas ser mi San Valentín de por vida y mi compañera de juicios y alegrías para siempre?",
+                options: [
+                    { text: "A) Pido el beneficio de la duda y lo pienso un poco más.", correct: false, feedback: "❌ ¡No hay duda que valga! El amor está probado y es de fondo. ¡Di que sí!" },
+                    { text: "B) Me declaro en rebeldía y me escapo sola.", correct: false, feedback: "❌ Si te escapas, ¡te persigo con la fuerza pública del amor! Elige bien, licenciada." },
+                    { text: "C) ¡SENTENCIA FIRME! Acepto ser tuya por siempre, sin derecho a apelación. ❤️", correct: true, feedback: "💕 ¡Caso cerrado! Has aceptado la condena más dulce del mundo. ¡Eres mi San Valentín por siempre!" }
+                ]
+            }
+        ];
+
+        let currentLevel = 0;
+
+        function startGame() {
+            playSound('start');
+            
+            // Iniciar música de fondo
+            const bgMusic = document.getElementById('backgroundMusic');
+            bgMusic.volume = 0.25; // Volumen al 25% para que no opaque los efectos de sonido
+            bgMusic.play().catch(e => console.log("Reproducción de música requiere interacción del usuario"));
+            
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').style.display = 'block';
+            loadLevel(currentLevel);
+        }
+
+        function loadLevel(levelIndex) {
+            const level = levels[levelIndex];
+            document.getElementById('levelBadge').textContent = `Nivel ${level.level}`;
+            document.getElementById('questionText').textContent = level.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            level.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option.text;
+                button.onclick = () => selectOption(option, levelIndex);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectOption(option, levelIndex) {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('feedbackScreen').style.display = 'block';
+            
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            feedbackMessage.textContent = option.feedback;
+            
+            if (option.correct) {
+                feedbackMessage.className = 'feedback-message correct';
+                playSound('correct');
+                createParticleEffect('heart', 30); // Lluvia de corazones rosas
+                
+                setTimeout(() => {
+                    currentLevel++;
+                    if (currentLevel < levels.length) {
+                        document.getElementById('feedbackScreen').style.display = 'none';
+                        document.getElementById('gameScreen').style.display = 'block';
+                        loadLevel(currentLevel);
+                    } else {
+                        showFinalScreen();
+                    }
+                }, 4000);
+            } else {
+                feedbackMessage.className = 'feedback-message incorrect';
+                playSound('error');
+                
+                // Determinar tipo de lluvia según la opción incorrecta
+                const optionText = option.text.toLowerCase();
+                if (optionText.includes('a)')) {
+                    createParticleEffect('broken', 25); // Corazones rotos
+                } else {
+                    createParticleEffect('angry', 25); // Emojis enojados
+                }
+                
+                setTimeout(() => {
+                    document.getElementById('feedbackScreen').style.display = 'none';
+                    document.getElementById('gameScreen').style.display = 'block';
+                }, 4000);
+            }
+        }
+
+        function showFinalScreen() {
+            document.getElementById('feedbackScreen').style.display = 'none';
+            document.getElementById('finalScreen').style.display = 'block';
+            playSound('winner');
+            createParticleEffect('mixed', 50); // Gran lluvia de corazones
+        }
+
+        function createParticleEffect(emojiType, count) {
+            const emojiMap = {
+                'heart': '❤️',
+                'broken': '💔',
+                'angry': '😠',
+                'mixed': ['❤️', '💕', '💖', '💗']
+            };
+            
+            let emojis = [];
+            if (emojiType === 'heart') {
+                emojis = ['❤️'];
+            } else if (emojiType === 'broken') {
+                emojis = ['💔'];
+            } else if (emojiType === 'angry') {
+                emojis = ['😠'];
+            } else if (emojiType === 'mixed') {
+                emojis = ['❤️', '💕', '💖', '💗'];
+            }
+            
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    particle.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                    particle.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 5000);
+                }, i * 100);
+            }
+        }
+
+        // Sistema de sonido simplificado (efectos de sonido con Web Audio API)
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'start':
+                    oscillator.frequency.value = 523.25; // Do
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                    break;
+                case 'correct':
+                    oscillator.frequency.value = 659.25; // Mi
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.4);
+                    
+                    // Segundo tono para efecto de acierto
+                    setTimeout(() => {
+                        const osc2 = audioContext.createOscillator();
+                        const gain2 = audioContext.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioContext.destination);
+                        osc2.frequency.value = 783.99; // Sol
+                        gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                        osc2.start(audioContext.currentTime);
+                        osc2.stop(audioContext.currentTime + 0.4);
+                    }, 150);
+                    break;
+                case 'error':
+                    oscillator.frequency.value = 220; // La grave
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.6);
+                    break;
+                case 'winner':
+                    // Secuencia de tonos ascendentes para victoria
+                    const notes = [523.25, 587.33, 659.25, 783.99];
+                    notes.forEach((freq, index) => {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.frequency.value = freq;
+                            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                            osc.start(audioContext.currentTime);
+                            osc.stop(audioContext.currentTime + 0.5);
+                        }, index * 200);
+                    });
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
